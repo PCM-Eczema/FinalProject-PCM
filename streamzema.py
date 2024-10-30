@@ -6,7 +6,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from skimage.measure import regionprops_table
 from skimage import io, color, measure, img_as_ubyte, feature, filters, exposure
-from fuzzywuzzy import process
+from fuzzywuzzy import process as prc
 
 
 # Load the image and process it once, making `img` available for all menu options
@@ -340,7 +340,7 @@ elif selected == "Chatbot":
     # Function to get similar questions - only defined on Chatbot page
     def get_suggestions(query, choices, limit=5):
         # Get the closest matches
-        suggestions = process.extract(query, choices, limit=limit)
+        suggestions = prc.extract(query, choices, limit=limit)
         return [suggestion[0] for suggestion in suggestions]
 
     # Display chat messages from history on app rerun
