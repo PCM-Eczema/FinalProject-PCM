@@ -292,7 +292,6 @@ elif selected == "Feature Extraction":
             )
 
 
-# Eczema Chatbot Page
 elif selected == "Chatbot":
     st.title("Eczema Chatbot 🤖")
 
@@ -332,11 +331,34 @@ elif selected == "Chatbot":
         "What is the difference between eczema and dermatitis?": "Eczema is a type of dermatitis, which is an umbrella term for skin inflammation. Dermatitis includes eczema, contact dermatitis, and seborrheic dermatitis.",
         "Can I exercise with eczema?": "Yes, but try to avoid overheating and wear breathable clothing. Showering and moisturizing afterward can help prevent sweat-induced irritation.",
         "How can I tell if my child has eczema?": "In children, eczema often appears as red, itchy patches on the face, elbows, or knees. If you suspect eczema, consult a pediatrician or dermatologist for diagnosis."
-        # Add other predefined Q&A pairs here if needed
     }
+
+    # Function to get similar questions
+    def get_suggestions(query, choices, limit=5):
+        # Get the closest matches
+        suggestions = process.extract(query, choices, limit=limit)
+        return [suggestion[0] for suggestion in suggestions]
+
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
 
     # Display predefined questions for user to choose
     st.write("### Ask me about Eczema:")
     user_question = st.selectbox("Choose a question:", [""] + list(qa_pairs.keys()))
 
-    # If
+    # If user selects a question, display answer
+    if user_question:
+        # Display user question in chat
+        with st.chat_message("user"):
+            st.markdown(user_question)
+        # Add user question to chat history
+        st.session_state.messages.append({"role": "user", "content": user_question})
+
+        # Display bot response
+        bot_response = qa_pairs.get(user_question, "I'm sorry, I don't have an answer for that question.")
+        with st.chat_message("assistant"):
+            st.markdown(bot_response)
+        # Add bot response to chat history
+        st.session_state.messages.append({"role": "assistant", "content": bot_response})
