@@ -59,16 +59,12 @@ elif selected == "Feature Extraction":
 
     elif selected2 == "Image Processing":
         st.subheader("Pre-Processing")
-        
-        # Calculate Otsu's Threshold
         threshold = filters.threshold_otsu(img)
         st.write(f"Otsu's threshold value: {threshold}")
 
-        # Apply Adaptive Histogram Equalization (AHE)
         img_hieq = exposure.equalize_adapthist(img, clip_limit=0.9) * 255  
         img_hieq = img_hieq.astype('uint8')
 
-        # Display original image with Otsu's contour and binary thresholded image
         fig, ax = plt.subplots(ncols=2, figsize=(12, 6))
         ax[0].imshow(img, cmap='gray')
         ax[0].contour(img, levels=[threshold], colors='red')
@@ -77,23 +73,13 @@ elif selected == "Feature Extraction":
         ax[1].set_title('Binary Image (Otsu Threshold Applied)')
         st.pyplot(fig)
 
-        # Display AHE result
-        st.subheader("Adaptive Histogram Equalization")
-        fig, ax = plt.subplots(figsize=(6, 6))
-        ax.imshow(img_hieq, cmap='gray')
-        ax.set_title('Adaptive Histogram Equalization')
-        st.pyplot(fig)
-
     elif selected2 == "Edge Detection":
         st.subheader("Edge Detection Filters")
-        
-        # Apply edge detection filters
         roberts = filters.roberts(img)
         sobel = filters.sobel(img)
         prewitt = filters.prewitt(img)
         canny = feature.canny(img, sigma=1)
 
-        # Display edge detection results in a 2x2 grid
         fig, ax = plt.subplots(2, 2, figsize=(8, 8))
         ax[0, 0].imshow(roberts, cmap='gray')
         ax[0, 0].set_title('Roberts')
@@ -103,20 +89,13 @@ elif selected == "Feature Extraction":
         ax[1, 0].set_title('Prewitt')
         ax[1, 1].imshow(canny, cmap='gray')
         ax[1, 1].set_title(r'Canny $\sigma=1$')
-
-        for a in ax.flat:
-            a.axis('off')
-
         st.pyplot(fig)
 
     elif selected2 == "Image Segmentation":
         st.subheader("Contour Image and Labeling")
-
-        # Segment the image and display labeled regions
         label_img = label(img < filters.threshold_otsu(img))
         regions = regionprops(label_img)
-
-        # Display labeled regions with centroids and orientation
+        
         fig, ax = plt.subplots()
         ax.imshow(img, cmap=plt.cm.gray)
 
@@ -125,15 +104,8 @@ elif selected == "Feature Extraction":
             orientation = props.orientation
             x1 = x0 + math.cos(orientation) * 0.5 * props.minor_axis_length
             y1 = y0 - math.sin(orientation) * 0.5 * props.minor_axis_length
-            x2 = x0 - math.sin(orientation) * 0.5 * props.major_axis_length
-            y2 = y0 - math.cos(orientation) * 0.5 * props.major_axis_length
-
-            # Plot centroid and orientation
             ax.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
-            ax.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
             ax.plot(x0, y0, '.g', markersize=15)
-
-        ax.set_title("Centroid and Orientation of Labeled Regions")
         st.pyplot(fig)
 
     elif selected2 == "Data":
@@ -143,17 +115,12 @@ elif selected == "Feature Extraction":
             df_existing = pd.read_excel(excel_path)
             st.write("Existing Extracted Features:")
             st.write(df_existing)
-        else:
-            st.info("No existing data found. New data will be created after extraction.")
 
         label_img = measure.label(img < filters.threshold_otsu(img))
         props = regionprops_table(label_img, properties=('centroid', 'orientation', 'major_axis_length', 'minor_axis_length'))
         df_new = pd.DataFrame(props)
         st.write("Newly Extracted Features:")
         st.write(df_new)
-
-        with pd.ExcelWriter(excel_path, mode='a', if_sheet_exists='replace') as writer:
-            df_new.to_excel(writer, index=False, sheet_name='New Features')
 
 # Chatbot Page
 elif selected == "Chatbot":
@@ -163,9 +130,8 @@ elif selected == "Chatbot":
         st.session_state["messages"] = []
 
     qa_pairs = {
-        "What is eczema?": "Eczema is a condition that makes your skin red and itchy. It's common in children but can occur at any age.",
+        "What is eczema?": "Eczema is a condition that makes your skin red and itchy.",
         "How can I prevent eczema flare-ups?": "To prevent flare-ups, keep your skin moisturized, avoid triggers, and avoid scratching.",
-        # Add more questions and answers here
     }
 
     st.write("### Ask me about Eczema:")
@@ -176,7 +142,7 @@ elif selected == "Chatbot":
             st.markdown(user_question)
         st.session_state.messages.append({"role": "user", "content": user_question})
 
-        bot_response = qa_pairs.get(user_question, "I'm sorry, I don't have an answer for that question.")
+        bot_response = qa_pairs.get(user_question, "I'm sorry, I don't have an answer.")
         with st.chat_message("assistant"):
             st.markdown(bot_response)
         st.session_state.messages.append({"role": "assistant", "content": bot_response})
