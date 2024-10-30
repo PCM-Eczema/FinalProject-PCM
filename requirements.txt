@@ -1,8 +1,8 @@
 streamlit
 streamlit-option-menu
-pandas
-numpy
-matplotlib
 scipy
 scikit-image
-openpyxl  # diperlukan untuk menulis ke file Excel
+openpyxl
+matplotlib==3.5.3
+pandas==1.3.3
+numpy==1.21.2
