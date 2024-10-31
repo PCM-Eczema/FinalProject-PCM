@@ -234,7 +234,7 @@ elif selected == "Feature Extraction":
                 minr, minc, maxr, maxc = props.bbox
                 bx = (minc, maxc, maxc, minc, minc)
                 by = (minr, minr, maxr, maxr, minr)
-                ax.plot(bx, by, '-b', linewidth=2.5)
+                ax4.plot(bx, by, '-b', linewidth=2.5)
                 
 
             ax4.set_title("Centroid and Orientation of Labeled Regions")
