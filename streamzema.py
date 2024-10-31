@@ -174,104 +174,49 @@ elif selected == "Feature Extraction":
           # Image Segmentation Section
         elif selected2 == "Image Segmentation":
             st.subheader("Contour Image")
-            
-            # Import necessary libraries
-            from skimage import exposure, filters, morphology
-            from skimage.measure import label, regionprops
-            import numpy as np
-            import matplotlib.pyplot as plt
-            from matplotlib.colors import ListedColormap
-            from scipy import ndimage as ndi
-            import math
-            
-            # Step 1: Image preprocessing and segmentation
             img_hieq = exposure.equalize_adapthist(img, clip_limit=0.9) * 255
             binary_image = img_hieq < filters.threshold_otsu(img_hieq)
             only_large_blobs = morphology.remove_small_objects(binary_image, min_size=100)
             only_large = np.logical_not(morphology.remove_small_objects(np.logical_not(only_large_blobs), min_size=100))
             image_segmented = only_large
-        
-            # Step 2: Display the segmented image with contour
-            fig, ax = plt.subplots()
-            ax.imshow(image_segmented, cmap='gray')
-            ax.contour(image_segmented, levels=[0.5])
-            st.pyplot(fig)
-        
-            # Step 3: Label image with random colors
-            lab_image = image_segmented
-            rand_cmap = ListedColormap(np.random.rand(256, 3))  # Create a random colormap
-            labels, nlabels = ndi.label(image_segmented)
-            labels_for_display = np.where(labels > 0, labels, np.nan)
-            
-            fig2, ax2 = plt.subplots()
-            ax2.imshow(image_segmented, cmap='gray')
-            ax2.imshow(labels_for_display, cmap=rand_cmap)
-            ax2.axis('off')
-            ax2.set_title(f'Ezcema Subacute Labeled ({nlabels} labels)')
-            st.pyplot(fig2)
-        
-            # Step 4: Filtering objects and display with size labels
-            boxes = ndi.find_objects(labels)
-            
-            # Filter objects based on size and update labels
-            for label_ind, label_coords in enumerate(boxes):
-                if label_coords is None:
-                    continue  # Skip if the label is invalid
-        
-                cell = lab_image[label_coords]
-                cell_size = np.prod(cell.shape)
-                
-                # Remove objects that are smaller than the threshold
-                if cell_size < 5000:
-                    lab_image = np.where(labels == label_ind + 1, 0, lab_image)
-        
-            # Regenerate labels after filtering
-            labels, nlabels = ndi.label(lab_image)
-            st.write(f'Terdapat {nlabels} komponen / objek yang terdeteksi setelah filtering.')
-        
-            # Step 5: Display the filtered objects with size labels
-            fig3, axes = plt.subplots(nrows=1, ncols=6, figsize=(10, 6))
-            for ii, obj_indices in enumerate(ndi.find_objects(labels)[5:11]):
-                if obj_indices is not None:
-                    cell = image_segmented[obj_indices]
-                    axes[ii].imshow(cell, cmap='gray')
-                    axes[ii].axis('off')
-                    axes[ii].set_title(f'Label #{ii+1}\nSize: {cell.shape}')
-            
-            plt.tight_layout()
-            st.pyplot(fig3)
-        
-            # Step 6: Analyze and display centroid, orientation, and bounding boxes
-            image = lab_image
-            label_img = label(image)
-            regions = regionprops(label_img)
-        
-            fig4, ax4 = plt.subplots()
-            ax4.imshow(image, cmap=plt.cm.gray)
-        
-            for props in regions:
-                y0, x0 = props.centroid
-                orientation = props.orientation
-                x1 = x0 + math.cos(orientation) * 0.5 * props.minor_axis_length
-                y1 = y0 - math.sin(orientation) * 0.5 * props.minor_axis_length
-                x2 = x0 - math.sin(orientation) * 0.5 * props.major_axis_length
-                y2 = y0 - math.cos(orientation) * 0.5 * props.major_axis_length
-        
-                # Plot centroid and orientation lines
-                ax4.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
-                ax4.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
-                ax4.plot(x0, y0, '.g', markersize=15)
-        
-                # Plot bounding box
-                minr, minc, maxr, maxc = props.bbox
-                bx = (minc, maxc, maxc, minc, minc)
-                by = (minr, minr, maxr, maxr, minr)
-                ax4.plot(bx, by, '-b', linewidth=2.5)
-        
-            # Show the final plot with orientation and bounding boxes
-            ax4.set_title("Centroid, Orientation, and Bounding Boxes of Labeled Regions")
-            st.pyplot(fig4)
 
+            # Menampilkan gambar dengan kontur
+            if 'image_segmented' in locals() and 'img' in locals():
+                image_segmented = img_as_ubyte(image_segmented)
+                threshold = filters.threshold_otsu(img) 
+                
+                fig, ax = plt.subplots()
+                ax.imshow(image_segmented, cmap='gray')
+                ax.contour(image_segmented, [threshold])
+                st.pyplot(fig)
+
+        # Data Extraction Section
+        elif selected2 == "Data":
+            st.subheader("Extracted Data")
+            
+            # Hitung properti menggunakan regionprops
+            label_img = measure.label(img < filters.threshold_otsu(img))
+            props = regionprops_table(label_img, properties=('centroid', 'orientation', 'major_axis_length', 'minor_axis_length'))
+            df_new = pd.DataFrame(props)
+            st.write("Newly Extracted Features:")
+            st.write(df_new)
+
+            # Path untuk menyimpan file Excel baru
+            excel_path = r"extract_features.xlsx"  # Simpan di direktori kerja saat ini
+
+            # Simpan data baru ke Excel (mode 'w' untuk membuat file baru)
+            with pd.ExcelWriter(excel_path, mode='w', engine="openpyxl") as writer:
+                df_new.to_excel(writer, index=False, sheet_name='New Features')
+
+            # Tombol unduh untuk file Excel yang baru dibuat
+            st.write("⬇️DOWNLOAD FEATURES⬇️")
+            with open(excel_path, 'rb') as file:
+                st.download_button(
+                    label="Download extracted features as Excel",
+                    data=file.read(),
+                    file_name="extract_features.xlsx",  # Nama file untuk unduhan
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                )
 
 
 
