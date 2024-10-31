@@ -282,9 +282,9 @@ elif selected == "Feature Extraction":
             # Label the segmented image
             labels, nlabels = ndi.label(image_segmented)
             
-            # Display original RGB image
+            # Display grayscale image
             fig, ax = plt.subplots()
-            ax.imshow(im)  # Show original RGB image
+            ax.imshow(img, cmap='gray')  # Show grayscale image as background
         
             # Overlay label image with colormap
             ax.imshow(labels, cmap='jet', alpha=0.5)  # Apply 'jet' colormap with transparency
