@@ -280,9 +280,9 @@ elif selected == "Feature Extraction":
         ax3.set_title("Centroid and Orientation of Labeled Regions")
         st.pyplot(fig3)
 
-        # Data Extraction Section
-        elif selected2 == "Data":
-            st.subheader("Extracted Data")
+    # Data Extraction Section
+    elif selected2 == "Data":
+        st.subheader("Extracted Data")
             
             # Hitung properti menggunakan regionprops
             label_img = measure.label(img < filters.threshold_otsu(img))
