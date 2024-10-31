@@ -31,15 +31,19 @@ To run the application locally, follow these steps:
 1. Clone this repository:
    ```bash
    git clone https://github.com/username/eczema-extraction.git
+   ```
 2. Navigate to the project directory:
   ```bash
   Copy code
   cd eczema-extraction
+   ```
 3. Install the required dependencies:
   ```bash
   Copy code
   pip install -r requirements.txt
+   ```
 4. Run the Streamlit app:
   ```bash
   Copy code
   streamlit run app.py
+   ```
