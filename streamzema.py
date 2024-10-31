@@ -210,9 +210,10 @@ elif selected == "Feature Extraction":
             # Filtering objects and display with size labels
             from scipy import ndimage as ndi
             boxes = ndi.find_objects(labels)
+            
             for label_ind, label_coords in enumerate(boxes):
-            if label_coords is None:
-                continue  # Jika label tidak valid, lewati
+                if label_coords is None:
+                    continue  # Jika label tidak valid, lewati
 
             cell = lab_image[label_coords]
 
