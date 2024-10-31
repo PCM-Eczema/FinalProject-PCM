@@ -229,12 +229,12 @@ elif selected == "Feature Extraction":
 
             fig3, axes = plt.subplots(nrows=1, ncols=6, figsize=(10, 6))
             for ii, obj_indices in enumerate(ndi.find_objects(labels)[5:11]):
-            if obj_indices is not None:
-                cell = image_segmented[obj_indices]
-                axes[ii].imshow(cell, cmap='gray')
-                axes[ii].axis('off')
-                axes[ii].set_title(f'Label #{ii+1}\nUkuran: {cell.shape}')
-        
+                if obj_indices is not None:
+                    cell = image_segmented[obj_indices]
+                    axes[ii].imshow(cell, cmap='gray')
+                    axes[ii].axis('off')
+                    axes[ii].set_title(f'Label #{ii+1}\nUkuran: {cell.shape}')
+            
             plt.tight_layout()
             st.pyplot(fig3)
             
