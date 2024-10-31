@@ -217,8 +217,6 @@ elif selected == "Feature Extraction":
             st.pyplot(fig3)
 
             # Filtering objects and display with orientation lines and centroids
-
-            
             fig4, ax4 = plt.subplots()
             ax4.imshow(image_segmented, cmap=plt.cm.gray)
             for props in regions:
@@ -233,6 +231,11 @@ elif selected == "Feature Extraction":
                 ax4.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
                 ax4.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
                 ax4.plot(x0, y0, '.g', markersize=15)
+                minr, minc, maxr, maxc = props.bbox
+                bx = (minc, maxc, maxc, minc, minc)
+                by = (minr, minr, maxr, maxr, minr)
+                ax.plot(bx, by, '-b', linewidth=2.5)
+                
 
             ax4.set_title("Centroid and Orientation of Labeled Regions")
             st.pyplot(fig4)
