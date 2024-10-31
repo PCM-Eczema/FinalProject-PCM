@@ -208,7 +208,8 @@ elif selected == "Feature Extraction":
             st.pyplot(fig2)
 
             # Filtering objects and display with size labels
-             boxes = ndi.find_objects(labels)
+            from scipy import ndimage as ndi
+            boxes = ndi.find_objects(labels)
             for label_ind, label_coords in enumerate(boxes):
             if label_coords is None:
                 continue  # Jika label tidak valid, lewati
