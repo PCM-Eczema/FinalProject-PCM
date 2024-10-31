@@ -242,7 +242,10 @@ elif selected == "Feature Extraction":
             st.pyplot(fig3)
         
             # Step 6: Analyze and display centroid, orientation, and bounding boxes
-           def plot_image_with_region_props(image):
+    from skimage.measure import label, regionprops
+    import math
+            def plot_image_with_region_props(image):
+                
     # Label the regions
     label_img = label(image)
     regions = regionprops(label_img)
