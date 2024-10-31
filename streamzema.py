@@ -274,6 +274,7 @@ elif selected == "Feature Extraction":
 
 
 
+
 # Eczema Chatbot Page
 elif selected == "Chatbot":
     st.title("Eczema Chatbot 🤖")
