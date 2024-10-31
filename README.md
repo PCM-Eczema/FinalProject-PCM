@@ -1,28 +1,33 @@
 # Eczema Extraction
 
-Welcome to **Eczema Extraction**! This is a Streamlit-based web application designed for the detection and analysis of Eczema features from medical images using image processing and machine learning techniques.
+Welcome to **Eczema Extraction**! This is a Streamlit-based web application designed for the detection and analysis of Eczema features from medical images using image processing.
 
 ## Features
 
-- **Image Upload**: Upload medical images for analysis.
-- **Image Segmentation**: The app performs segmentation on uploaded images to isolate regions relevant to Eczema analysis.
-- **Feature Extraction**: Extracts various features such as area, color, texture, and other morphological data for further study.
-- **Classification**: Uses machine learning models to classify the extracted features and provide predictions related to Eczema severity or type.
-- **Visualization**: Displays processed images and key metrics from the analysis.
+- **Image Upload**: Supports uploading Eczema images in `.jpg`, `.jpeg`, or `.png` formats (up to 200MB per file).
+- **Pre-Processing**: Applies Otsu's thresholding to generate contour and binary images for initial analysis.
+- **Image Processing**: Offers tools for edge detection, segmentation, and other image enhancement features.
+- **Feature Extraction**: Extracts essential features from Eczema images to assist in diagnosis and research.
+- **Data Visualization**: Displays original and processed images side by side, along with calculated metrics.
+- **Integrated Chatbot**: Provides assistance and answers to questions related to the app and Eczema.
 
 ## Getting Started
 
 1. **Access the Application**: Visit the app at [https://eczemaextraction.streamlit.app](https://eczemaextraction.streamlit.app).
 2. **Upload an Image**: Use the upload button to upload a medical image for Eczema analysis.
-3. **Run Analysis**: Click "Analyze" to initiate image processing, segmentation, and feature extraction.
-4. **View Results**: The results, including segmented images and classification details, will be displayed on the screen.
+3. **View Results**: The results, including segmented images and classification details, will be displayed on the screen.
 
 ## Technologies Used
 
-- **Streamlit**: For creating the web interface.
-- **OpenCV**: For image processing and feature extraction.
-- **Scikit-Learn / TensorFlow**: For the machine learning model to classify features.
-- **Pandas & NumPy**: For data manipulation and calculations.
+- **Streamlit**: For creating the interactive web interface.
+- **streamlit-option-menu**: For enhanced menu options in the app.
+- **SciPy**: For advanced mathematical and scientific computations.
+- **scikit-image**: For image processing tasks.
+- **openpyxl**: For handling Excel files.
+- **Matplotlib**: For data visualization and plotting.
+- **Pandas**: For data manipulation and handling.
+- **NumPy**: For numerical computations.
+- **fuzzywuzzy**: For string matching and similarity scoring.
 
 ## Installation (Optional for Local Setup)
 
