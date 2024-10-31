@@ -171,7 +171,7 @@ elif selected == "Feature Extraction":
 
             st.pyplot(fig)
 
-               # Image Segmentation Section
+             # Image Segmentation Section
         elif selected2 == "Image Segmentation":
             st.subheader("Contour Image")
             
@@ -240,6 +240,37 @@ elif selected == "Feature Extraction":
             
             plt.tight_layout()
             st.pyplot(fig3)
+            
+            # Step 6: Display bounding boxes, centroids, and orientations
+            image = lab_image
+            label_img = label(image)
+            regions = regionprops(label_img)
+        
+            fig4, ax4 = plt.subplots()
+            ax4.imshow(image, cmap=plt.cm.gray)
+        
+            for props in regions:
+                y0, x0 = props.centroid
+                orientation = props.orientation
+                x1 = x0 + math.cos(orientation) * 0.5 * props.minor_axis_length
+                y1 = y0 - math.sin(orientation) * 0.5 * props.minor_axis_length
+                x2 = x0 - math.sin(orientation) * 0.5 * props.major_axis_length
+                y2 = y0 - math.cos(orientation) * 0.5 * props.major_axis_length
+        
+                # Plot centroid and orientation
+                ax4.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
+                ax4.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
+                ax4.plot(x0, y0, '.g', markersize=15)
+        
+                # Draw bounding box
+                minr, minc, maxr, maxc = props.bbox
+                bx = (minc, maxc, maxc, minc, minc)
+                by = (minr, minr, maxr, maxr, minr)
+                ax4.plot(bx, by, '-b', linewidth=2.5)
+        
+            ax4.set_title("Centroid and Orientation of Labeled Regions")
+            st.pyplot(fig4)
+
 
 
         # Data Extraction Section
