@@ -203,12 +203,24 @@ elif selected == "Feature Extraction":
             ax2.set_title(f'Ezcema Subacute Labeled ({nlabels} labels)')
             st.pyplot(fig2)
 
-            # Filtering objects and display
+            # Filtering objects and display with size labels
             label_img = label(image_segmented)
             regions = regionprops(label_img)
+            
+            fig3, axes3 = plt.subplots(nrows=1, ncols=6, figsize=(10, 6))
+            for i, obj_indices in enumerate(ndi.find_objects(labels)[5:11]):
+                cell = image_segmented[obj_indices]
+                axes3[i].imshow(cell, cmap='gray')
+                axes3[i].axis('off')
+                axes3[i].set_title(f'Label #{i+1}\nSize: {cell.shape}')
+            plt.tight_layout()
+            st.pyplot(fig3)
 
-            fig3, ax3 = plt.subplots()
-            ax3.imshow(image_segmented, cmap=plt.cm.gray)
+            # Filtering objects and display with orientation lines and centroids
+
+            
+            fig4, ax4 = plt.subplots()
+            ax4.imshow(image_segmented, cmap=plt.cm.gray)
             for props in regions:
                 y0, x0 = props.centroid
                 orientation = props.orientation
@@ -216,14 +228,14 @@ elif selected == "Feature Extraction":
                 y1 = y0 - math.sin(orientation) * 0.5 * props.minor_axis_length
                 x2 = x0 - math.sin(orientation) * 0.5 * props.major_axis_length
                 y2 = y0 - math.cos(orientation) * 0.5 * props.major_axis_length
-
+            
                 # Plot centroid and orientation
-                ax3.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
-                ax3.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
-                ax3.plot(x0, y0, '.g', markersize=15)
+                ax4.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
+                ax4.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
+                ax4.plot(x0, y0, '.g', markersize=15)
 
-            ax3.set_title("Centroid and Orientation of Labeled Regions")
-            st.pyplot(fig3)
+            ax4.set_title("Centroid and Orientation of Labeled Regions")
+            st.pyplot(fig4)
 
         # Data Extraction Section
         elif selected2 == "Data":
