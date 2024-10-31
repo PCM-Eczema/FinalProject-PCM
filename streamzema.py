@@ -272,6 +272,30 @@ elif selected == "Feature Extraction":
             ax4.set_title("Centroid, Orientation, and Bounding Boxes of Labeled Regions")
             st.pyplot(fig4)
 
+            #Overlay Colormap with RGB
+            img_hieq = exposure.equalize_adapthist(img, clip_limit=0.9) * 255
+            binary_image = img_hieq < filters.threshold_otsu(img_hieq)
+            only_large_blobs = morphology.remove_small_objects(binary_image, min_size=100)
+            only_large = np.logical_not(morphology.remove_small_objects(np.logical_not(only_large_blobs), min_size=100))
+            image_segmented = only_large
+        
+            # Label the segmented image
+            labels, nlabels = ndi.label(image_segmented)
+            
+            # Display original RGB image
+            fig, ax = plt.subplots()
+            ax.imshow(im)  # Show original RGB image
+        
+            # Overlay label image with colormap
+            ax.imshow(labels, cmap='jet', alpha=0.5)  # Apply 'jet' colormap with transparency
+        
+            # Add title and disable axis
+            ax.set_title("RGB Image Overlayed with Colormap of Labeled Regions")
+            ax.axis('off')
+            
+            # Display the overlay
+            st.pyplot(fig)
+
         # Data Extraction Section
         elif selected2 == "Data":
             st.subheader("Extracted Data")
