@@ -192,6 +192,10 @@ elif selected == "Feature Extraction":
             st.pyplot(fig)
 
             # Label image with random colors
+            from matplotlib.colors import ListedColormap
+            from scipy import ndimage as ndi
+            
+            lab_image = image_segmented
             rand_cmap = ListedColormap(np.random.rand(256, 3))  # Create a random colormap
             labels, nlabels = ndi.label(image_segmented)
             labels_for_display = np.where(labels > 0, labels, np.nan)
@@ -204,6 +208,35 @@ elif selected == "Feature Extraction":
             st.pyplot(fig2)
 
             # Filtering objects and display with size labels
+             boxes = ndi.find_objects(labels)
+            for label_ind, label_coords in enumerate(boxes):
+            if label_coords is None:
+                continue  # Jika label tidak valid, lewati
+
+            cell = lab_image[label_coords]
+
+            # Filter objek berdasarkan ukuran
+            cell_size = np.prod(cell.shape)
+
+            if cell_size < 5000: 
+                lab_image = np.where(labels == label_ind + 1, 0, lab_image)
+        
+            # Regenerasi label setelah filter
+            labels, nlabels = ndi.label(lab_image)
+            st.write(f'Terdapat {nlabels} komponen / objek yang terdeteksi setelah filtering.')
+
+            fig3, axes = plt.subplots(nrows=1, ncols=6, figsize=(10, 6))
+            for ii, obj_indices in enumerate(ndi.find_objects(labels)[5:11]):
+            if obj_indices is not None:
+                cell = image_segmented[obj_indices]
+                axes[ii].imshow(cell, cmap='gray')
+                axes[ii].axis('off')
+                axes[ii].set_title(f'Label #{ii+1}\nUkuran: {cell.shape}')
+        
+            plt.tight_layout()
+            st.pyplot(fig3)
+            
+            # Running labeling and analyze region property
             label_img = label(image_segmented)
             regions = regionprops(label_img)
             
