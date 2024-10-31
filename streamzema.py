@@ -222,7 +222,7 @@ elif selected == "Feature Extraction":
                 cell_size = np.prod(cell.shape)
                 
                 # Remove objects that are smaller than the threshold
-                if cell_size < 5000:
+                if cell_size < 4000:
                     lab_image = np.where(labels == label_ind + 1, 0, lab_image)
         
             # Regenerate labels after filtering
