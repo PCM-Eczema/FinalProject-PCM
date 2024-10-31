@@ -6,9 +6,7 @@ import streamlit as st
 from streamlit_option_menu import option_menu
 from skimage.measure import regionprops_table
 from skimage import io, color, measure, img_as_ubyte, feature, filters, exposure, morphology
-from skimage.measure import regionprops_table
 from io import BytesIO
-
 
 # Judul Aplikasi
 st.title("Pengolahan Citra Medika")
@@ -19,7 +17,6 @@ st.markdown("""
             background: linear-gradient(to right, #ff9a9e, #fecfef); /* Pink bright gradient */
             color: white;
         }
-        /* Optional: Adjust text color to stand out */
         [data-testid="stHeader"] {
             color: white;
         }
@@ -28,7 +25,7 @@ st.markdown("""
 
 # Sidebar menu
 with st.sidebar:
-    selected = option_menu("Pengolahan Citra Medika",["Home", "More About Eczema", "Feature Extraction", "Chatbot"], default_index=0)
+    selected = option_menu("Pengolahan Citra Medika", ["Home", "More About Eczema", "Feature Extraction", "Chatbot"], default_index=0)
 
 # Home Page
 if selected == "Home":
@@ -174,150 +171,90 @@ elif selected == "Feature Extraction":
 
             st.pyplot(fig)
 
-    # Bagian dalam blok "Image Segmentation"
-    elif selected2 == "Image Segmentation":
-        st.subheader("Contour Image")
-        from skimage import morphology
-        import math
-        from skimage.measure import label, regionprops
-        
-        img_hieq = exposure.equalize_adapthist(img, clip_limit=0.9) * 255
-        binary_image = img_hieq < filters.threshold_otsu(img_hieq)
-        only_large_blobs = morphology.remove_small_objects(binary_image, min_size=100)
-        only_large = np.logical_not(morphology.remove_small_objects(np.logical_not(only_large_blobs), min_size=100))
-        image_segmented = only_large
-        
-        # Periksa apakah `image_segmented` dan `img` valid
-        if 'image_segmented' in locals() and 'img' in locals():
-            # Konversi tipe data ke uint8
-            image_segmented = img_as_ubyte(image_segmented)
-            threshold = filters.threshold_otsu(img) 
+        # Image Segmentation Section
+        elif selected2 == "Image Segmentation":
+            st.subheader("Contour Image")
+            from skimage.measure import label, regionprops
+            import math
+            from matplotlib.colors import ListedColormap
+            from scipy import ndimage as ndi
             
-            # Menampilkan gambar dengan kontur
+            img_hieq = exposure.equalize_adapthist(img, clip_limit=0.9) * 255
+            binary_image = img_hieq < filters.threshold_otsu(img_hieq)
+            only_large_blobs = morphology.remove_small_objects(binary_image, min_size=100)
+            only_large = np.logical_not(morphology.remove_small_objects(np.logical_not(only_large_blobs), min_size=100))
+            image_segmented = only_large
+
+            # Display the segmented image with contour
             fig, ax = plt.subplots()
             ax.imshow(image_segmented, cmap='gray')
-            ax.contour(image_segmented, [threshold])
-            
-            # Menampilkan plot di Streamlit
+            ax.contour(image_segmented, levels=[0.5])
             st.pyplot(fig)
 
-    # Tambahan kode untuk pewarnaan acak pada label
-        from matplotlib.colors import ListedColormap
-        from scipy import ndimage as ndi
-
-        lab_image = image_segmented
-        rand_cmap = ListedColormap(np.random.rand(256, 3))  # Membuat colormap acak
-        labels, nlabels = ndi.label(lab_image)
-
-        labels_for_display = np.where(labels > 0, labels, np.nan)
-        
-        # Menampilkan gambar dengan label acak
-        fig2, ax2 = plt.subplots()
-        ax2.imshow(lab_image, cmap='gray')
-        ax2.imshow(labels_for_display, cmap=rand_cmap)
-        ax2.axis('off')
-        ax2.set_title(f'Ezcema Subacute Labeled ({nlabels} labels)')
-        st.pyplot(fig2)
-        
-        # Melakukan labeling pada objek yang ditemukan
-        boxes = ndi.find_objects(labels)
-        for label_ind, label_coords in enumerate(boxes):
-            if label_coords is None:
-                continue  # Jika label tidak valid, lewati
-
-            cell = lab_image[label_coords]
+            # Label image with random colors
+            rand_cmap = ListedColormap(np.random.rand(256, 3))  # Create a random colormap
+            labels, nlabels = ndi.label(image_segmented)
+            labels_for_display = np.where(labels > 0, labels, np.nan)
             
-            # Filter objek berdasarkan ukuran
-            cell_size = np.prod(cell.shape)
+            fig2, ax2 = plt.subplots()
+            ax2.imshow(image_segmented, cmap='gray')
+            ax2.imshow(labels_for_display, cmap=rand_cmap)
+            ax2.axis('off')
+            ax2.set_title(f'Ezcema Subacute Labeled ({nlabels} labels)')
+            st.pyplot(fig2)
 
-            if cell_size < 5000: 
-                lab_image = np.where(labels == label_ind + 1, 0, lab_image)
-        
-        # Regenerasi label setelah filter
-        labels, nlabels = ndi.label(lab_image)
-        st.write(f'Terdapat {nlabels} komponen / objek yang terdeteksi setelah filtering.')
+            # Filtering objects and display
+            label_img = label(image_segmented)
+            regions = regionprops(label_img)
 
-        # Menampilkan subset dari objek yang terdeteksi
-        fig3, axes = plt.subplots(nrows=1, ncols=6, figsize=(10, 6))
-        for ii, obj_indices in enumerate(ndi.find_objects(labels)[5:11]):
-            if obj_indices is not None:
-                cell = image_segmented[obj_indices]
-                axes[ii].imshow(cell, cmap='gray')
-                axes[ii].axis('off')
-                axes[ii].set_title(f'Label #{ii+1}\nUkuran: {cell.shape}')
-        
-        plt.tight_layout()
-        st.pyplot(fig3)
-    
-    # Menjalankan labeling dan menganalisis properti region
+            fig3, ax3 = plt.subplots()
+            ax3.imshow(image_segmented, cmap=plt.cm.gray)
+            for props in regions:
+                y0, x0 = props.centroid
+                orientation = props.orientation
+                x1 = x0 + math.cos(orientation) * 0.5 * props.minor_axis_length
+                y1 = y0 - math.sin(orientation) * 0.5 * props.minor_axis_length
+                x2 = x0 - math.sin(orientation) * 0.5 * props.major_axis_length
+                y2 = y0 - math.cos(orientation) * 0.5 * props.major_axis_length
 
-        label_img = label(lab_image)
-        regions = regionprops(label_img)
-        
-        # Menampilkan centroid dan orientasi pada gambar
-        fig3, ax3 = plt.subplots()
-        ax3.imshow(lab_image, cmap=plt.cm.gray)
-        
-        for props in regions:
-            y0, x0 = props.centroid
-            orientation = props.orientation
-            x1 = x0 + math.cos(orientation) * 0.5 * props.minor_axis_length
-            y1 = y0 - math.sin(orientation) * 0.5 * props.minor_axis_length
-            x2 = x0 - math.sin(orientation) * 0.5 * props.major_axis_length
-            y2 = y0 - math.cos(orientation) * 0.5 * props.major_axis_length
+                # Plot centroid and orientation
+                ax3.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
+                ax3.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
+                ax3.plot(x0, y0, '.g', markersize=15)
 
-            # Plot centroid, orientasi, dan bounding box
-            ax3.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
-            ax3.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
-            ax3.plot(x0, y0, '.g', markersize=15)
+            ax3.set_title("Centroid and Orientation of Labeled Regions")
+            st.pyplot(fig3)
 
-            # Plot bounding box
-            minr, minc, maxr, maxc = props.bbox
-            bx = (minc, maxc, maxc, minc, minc)
-            by = (minr, minr, maxr, maxr, minr)
-            ax3.plot(bx, by, '-b', linewidth=2.5)
-
-        ax3.set_title("Centroid and Orientation of Labeled Regions")
-        st.pyplot(fig3)
-
-    # Data Extraction Section
-    elif selected2 == "Data":
-        st.subheader("Extracted Data")
-            
-            # Hitung properti menggunakan regionprops
+        # Data Extraction Section
+        elif selected2 == "Data":
+            st.subheader("Extracted Data")
             label_img = measure.label(img < filters.threshold_otsu(img))
             props = regionprops_table(label_img, properties=('centroid', 'orientation', 'major_axis_length', 'minor_axis_length'))
             df_new = pd.DataFrame(props)
             st.write("Newly Extracted Features:")
             st.write(df_new)
 
-            # Path untuk menyimpan file Excel baru
-            excel_path = r"extract_features.xlsx"  # Simpan di direktori kerja saat ini
-
-            # Simpan data baru ke Excel (mode 'w' untuk membuat file baru)
+            # Save data to Excel
+            excel_path = "extract_features.xlsx"
             with pd.ExcelWriter(excel_path, mode='w', engine="openpyxl") as writer:
                 df_new.to_excel(writer, index=False, sheet_name='New Features')
 
-            # Tombol unduh untuk file Excel yang baru dibuat
             st.write("⬇️DOWNLOAD FEATURES⬇️")
             with open(excel_path, 'rb') as file:
                 st.download_button(
                     label="Download extracted features as Excel",
                     data=file.read(),
-                    file_name="extract_features.xlsx",  # Nama file untuk unduhan
+                    file_name="extract_features.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
-
 
 # Eczema Chatbot Page
 elif selected == "Chatbot":
     st.title("Eczema Chatbot 🤖")
 
-    # Initialize chat history if not already in session state
     if "messages" not in st.session_state:
         st.session_state["messages"] = []
 
-    # Predefined questions and answers for the chatbot
     qa_pairs = {
         "What is eczema?": "Eczema is a condition that makes your skin red and itchy. It's common in children but can occur at any age.",
         "What are the symptoms of eczema?": "Symptoms include red to brownish-gray patches, itching (especially at night), and small, raised bumps that may leak fluid.",
@@ -351,35 +288,16 @@ elif selected == "Chatbot":
         "How can I tell if my child has eczema?": "In children, eczema often appears as red, itchy patches on the face, elbows, or knees. If you suspect eczema, consult a pediatrician or dermatologist for diagnosis."
         # Add other predefined Q&A pairs here if needed
     }
-    
-    # Function to get similar questions - only defined on Chatbot page
-    def get_suggestions(query, choices, limit=5):
-        # Get the closest matches
-        suggestions = prc.extract(query, choices, limit=limit)
-        return [suggestion[0] for suggestion in suggestions]
 
-    # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-
-    
-    # Display predefined questions for user to choose
     st.write("### Ask me about Eczema:")
     user_question = st.selectbox("Choose a question:", [""] + list(qa_pairs.keys()))
 
-    # If user selects a question, display answer
     if user_question:
-        # Display user question in chat
         with st.chat_message("user"):
             st.markdown(user_question)
-        # Add user question to chat history
         st.session_state.messages.append({"role": "user", "content": user_question})
 
-        # Display bot response
         bot_response = qa_pairs.get(user_question, "I'm sorry, I don't have an answer for that question.")
         with st.chat_message("assistant"):
             st.markdown(bot_response)
-        # Add bot response to chat history
         st.session_state.messages.append({"role": "assistant", "content": bot_response})
-
