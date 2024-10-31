@@ -171,7 +171,7 @@ elif selected == "Feature Extraction":
 
             st.pyplot(fig)
 
-             # Image Segmentation Section
+            # Image Segmentation Section
         elif selected2 == "Image Segmentation":
             st.subheader("Contour Image")
             
@@ -240,8 +240,8 @@ elif selected == "Feature Extraction":
             
             plt.tight_layout()
             st.pyplot(fig3)
-            
-            # Step 6: Display bounding boxes, centroids, and orientations
+        
+            # Step 6: Analyze and display centroid, orientation, and bounding boxes
             image = lab_image
             label_img = label(image)
             regions = regionprops(label_img)
@@ -257,44 +257,21 @@ elif selected == "Feature Extraction":
                 x2 = x0 - math.sin(orientation) * 0.5 * props.major_axis_length
                 y2 = y0 - math.cos(orientation) * 0.5 * props.major_axis_length
         
-                # Plot centroid and orientation
+                # Plot centroid and orientation lines
                 ax4.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
                 ax4.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
                 ax4.plot(x0, y0, '.g', markersize=15)
         
-                # Draw bounding box
+                # Plot bounding box
                 minr, minc, maxr, maxc = props.bbox
                 bx = (minc, maxc, maxc, minc, minc)
                 by = (minr, minr, maxr, maxr, minr)
                 ax4.plot(bx, by, '-b', linewidth=2.5)
         
-            ax4.set_title("Centroid and Orientation of Labeled Regions")
+            # Show the final plot with orientation and bounding boxes
+            ax4.set_title("Centroid, Orientation, and Bounding Boxes of Labeled Regions")
             st.pyplot(fig4)
 
-
-
-        # Data Extraction Section
-        elif selected2 == "Data":
-            st.subheader("Extracted Data")
-            label_img = measure.label(img < filters.threshold_otsu(img))
-            props = regionprops_table(label_img, properties=('centroid', 'orientation', 'major_axis_length', 'minor_axis_length'))
-            df_new = pd.DataFrame(props)
-            st.write("Newly Extracted Features:")
-            st.write(df_new)
-
-            # Save data to Excel
-            excel_path = "extract_features.xlsx"
-            with pd.ExcelWriter(excel_path, mode='w', engine="openpyxl") as writer:
-                df_new.to_excel(writer, index=False, sheet_name='New Features')
-
-            st.write("⬇️DOWNLOAD FEATURES⬇️")
-            with open(excel_path, 'rb') as file:
-                st.download_button(
-                    label="Download extracted features as Excel",
-                    data=file.read(),
-                    file_name="extract_features.xlsx",
-                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
 
 # Eczema Chatbot Page
 elif selected == "Chatbot":
