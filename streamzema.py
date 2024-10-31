@@ -174,24 +174,111 @@ elif selected == "Feature Extraction":
 
             st.pyplot(fig)
 
-        # Image Segmentation Section
-        elif selected2 == "Image Segmentation":
-            st.subheader("Contour Image")
-            img_hieq = exposure.equalize_adapthist(img, clip_limit=0.9) * 255
-            binary_image = img_hieq < filters.threshold_otsu(img_hieq)
-            only_large_blobs = morphology.remove_small_objects(binary_image, min_size=100)
-            only_large = np.logical_not(morphology.remove_small_objects(np.logical_not(only_large_blobs), min_size=100))
-            image_segmented = only_large
-
+    # Bagian dalam blok "Image Segmentation"
+    elif selected2 == "Image Segmentation":
+        st.subheader("Contour Image")
+        from skimage import morphology
+        import math
+        from skimage.measure import label, regionprops
+        
+        img_hieq = exposure.equalize_adapthist(img, clip_limit=0.9) * 255
+        binary_image = img_hieq < filters.threshold_otsu(img_hieq)
+        only_large_blobs = morphology.remove_small_objects(binary_image, min_size=100)
+        only_large = np.logical_not(morphology.remove_small_objects(np.logical_not(only_large_blobs), min_size=100))
+        image_segmented = only_large
+        
+        # Periksa apakah `image_segmented` dan `img` valid
+        if 'image_segmented' in locals() and 'img' in locals():
+            # Konversi tipe data ke uint8
+            image_segmented = img_as_ubyte(image_segmented)
+            threshold = filters.threshold_otsu(img) 
+            
             # Menampilkan gambar dengan kontur
-            if 'image_segmented' in locals() and 'img' in locals():
-                image_segmented = img_as_ubyte(image_segmented)
-                threshold = filters.threshold_otsu(img) 
-                
-                fig, ax = plt.subplots()
-                ax.imshow(image_segmented, cmap='gray')
-                ax.contour(image_segmented, [threshold])
-                st.pyplot(fig)
+            fig, ax = plt.subplots()
+            ax.imshow(image_segmented, cmap='gray')
+            ax.contour(image_segmented, [threshold])
+            
+            # Menampilkan plot di Streamlit
+            st.pyplot(fig)
+
+    # Tambahan kode untuk pewarnaan acak pada label
+        from matplotlib.colors import ListedColormap
+        from scipy import ndimage as ndi
+
+        lab_image = image_segmented
+        rand_cmap = ListedColormap(np.random.rand(256, 3))  # Membuat colormap acak
+        labels, nlabels = ndi.label(lab_image)
+
+        labels_for_display = np.where(labels > 0, labels, np.nan)
+        
+        # Menampilkan gambar dengan label acak
+        fig2, ax2 = plt.subplots()
+        ax2.imshow(lab_image, cmap='gray')
+        ax2.imshow(labels_for_display, cmap=rand_cmap)
+        ax2.axis('off')
+        ax2.set_title(f'Ezcema Subacute Labeled ({nlabels} labels)')
+        st.pyplot(fig2)
+        
+        # Melakukan labeling pada objek yang ditemukan
+        boxes = ndi.find_objects(labels)
+        for label_ind, label_coords in enumerate(boxes):
+            if label_coords is None:
+                continue  # Jika label tidak valid, lewati
+
+            cell = lab_image[label_coords]
+            
+            # Filter objek berdasarkan ukuran
+            cell_size = np.prod(cell.shape)
+
+            if cell_size < 5000: 
+                lab_image = np.where(labels == label_ind + 1, 0, lab_image)
+        
+        # Regenerasi label setelah filter
+        labels, nlabels = ndi.label(lab_image)
+        st.write(f'Terdapat {nlabels} komponen / objek yang terdeteksi setelah filtering.')
+
+        # Menampilkan subset dari objek yang terdeteksi
+        fig3, axes = plt.subplots(nrows=1, ncols=6, figsize=(10, 6))
+        for ii, obj_indices in enumerate(ndi.find_objects(labels)[5:11]):
+            if obj_indices is not None:
+                cell = image_segmented[obj_indices]
+                axes[ii].imshow(cell, cmap='gray')
+                axes[ii].axis('off')
+                axes[ii].set_title(f'Label #{ii+1}\nUkuran: {cell.shape}')
+        
+        plt.tight_layout()
+        st.pyplot(fig3)
+    
+    # Menjalankan labeling dan menganalisis properti region
+
+        label_img = label(lab_image)
+        regions = regionprops(label_img)
+        
+        # Menampilkan centroid dan orientasi pada gambar
+        fig3, ax3 = plt.subplots()
+        ax3.imshow(lab_image, cmap=plt.cm.gray)
+        
+        for props in regions:
+            y0, x0 = props.centroid
+            orientation = props.orientation
+            x1 = x0 + math.cos(orientation) * 0.5 * props.minor_axis_length
+            y1 = y0 - math.sin(orientation) * 0.5 * props.minor_axis_length
+            x2 = x0 - math.sin(orientation) * 0.5 * props.major_axis_length
+            y2 = y0 - math.cos(orientation) * 0.5 * props.major_axis_length
+
+            # Plot centroid, orientasi, dan bounding box
+            ax3.plot((x0, x1), (y0, y1), '-r', linewidth=2.5)
+            ax3.plot((x0, x2), (y0, y2), '-r', linewidth=2.5)
+            ax3.plot(x0, y0, '.g', markersize=15)
+
+            # Plot bounding box
+            minr, minc, maxr, maxc = props.bbox
+            bx = (minc, maxc, maxc, minc, minc)
+            by = (minr, minr, maxr, maxr, minr)
+            ax3.plot(bx, by, '-b', linewidth=2.5)
+
+        ax3.set_title("Centroid and Orientation of Labeled Regions")
+        st.pyplot(fig3)
 
         # Data Extraction Section
         elif selected2 == "Data":
