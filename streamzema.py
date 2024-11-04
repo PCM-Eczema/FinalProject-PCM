@@ -59,7 +59,7 @@ with st.sidebar:
 # Apply the appropriate CSS for each page based on the selected option
 st.markdown(page_styles[selected], unsafe_allow_html=True)
 
-# Define members for photo reveal section
+# Define members for photo display
 members = [
     {"name": "Leony Purba 5023211013", "gif": "Leo.gif"},
     {"name": "Benedicta Sabdaningtyas 5023211029", "gif": "Bene.gif"},
@@ -70,22 +70,13 @@ members = [
 # Home Page
 if selected == "Home":
     st.title("Final Project ✨")
-    st.subheader("Anggota kelompok")
-    group_members = [
-        "Farhan Majid - 5023211049",
-        "Leony Purba - 5023211013",
-        "Benedicta Sabdaningtyas - 5023211029",
-        "Adelia Safira - 5023211061"
-    ]
-    for member in group_members:
-        st.markdown(f"<p style='font-family:Georgia; color: black; font-size: 20px;'>{member}</p>", unsafe_allow_html=True)
-    
-    # Member Photo Reveal
-    st.title("Meet the Team 🎉")
+    st.subheader("Anggota Kelompok")
+
+    # Display each member's name and GIF
     for member in members:
-        with st.expander(f"{member['name']} - Click to reveal!"):
-            if st.button(f"Reveal {member['name']}"):
-                st.image(member["gif"])
+        st.write(f"**{member['name']}**")
+        st.image(member["gif"])
+        st.markdown(f"<p style='font-family:Georgia; color: white; font-size: 20px;'>{member}</p>", unsafe_allow_html=True)
 
 # Eczema Subacute Page
 elif selected == "More About Eczema":
