@@ -76,7 +76,6 @@ if selected == "Home":
     for member in members:
         st.write(f"**{member['name']}**")
         st.image(member["gif"])
-        st.markdown(f"<p style='font-family:Georgia; color: white; font-size: 20px;'>{member}</p>", unsafe_allow_html=True)
 
 # Eczema Subacute Page
 elif selected == "More About Eczema":
