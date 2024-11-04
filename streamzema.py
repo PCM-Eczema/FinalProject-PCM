@@ -321,19 +321,17 @@ elif selected == "Feature Extraction":
             # Label the segmented image
             labels, nlabels = ndi.label(image_segmented)
             
+            # Create a random colormap
+            rand_cmap = ListedColormap(np.random.rand(256, 3))
+
+            # Display the grayscale image with overlay
             fig, ax = plt.subplots()
-            # Display the grayscale image as the base
-            ax.imshow(img, cmap='gray', interpolation='none')
-            
-            # Overlay the segmented regions with a colormap
-            ax.imshow(labels, cmap='jet', alpha=0.4)  # Adjust alpha for transparency
-            
-            # Set title and remove axis for a cleaner look
-            ax.set_title("Grayscale Image with Segmented Region Overlay")
+            ax.imshow(img, cmap='gray')  # Display grayscale image
+            ax.imshow(np.where(labels > 0, labels, np.nan), cmap='Paired', alpha=0.6)  # Overlay colormap
             ax.axis('off')
-            
-            # Display the overlay in Streamlit
+            ax.set_title(f'Overlayed Eczema Subacute ({nlabels} regions)')
             st.pyplot(fig)
+
 
         # Data Extraction Section
         elif selected2 == "Data":
