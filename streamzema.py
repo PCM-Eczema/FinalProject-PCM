@@ -7,6 +7,7 @@ from streamlit_option_menu import option_menu
 from skimage.measure import regionprops_table
 from skimage import io, color, measure, img_as_ubyte, feature, filters, exposure, morphology
 from io import BytesIO
+import time
 
 # Judul Aplikasi
 st.title("Pengolahan Citra Medika")
@@ -58,19 +59,22 @@ with st.sidebar:
 st.markdown(page_styles[selected], unsafe_allow_html=True)
 
 
-# Home Page
-if selected == "Home":
-    st.title('Final Project ✨')
-    st.subheader("Anggota kelompok")
-    group_members = [
-        "Farhan Majid - 5023211049",
-        "Leony Purba - 5023211013",
-        "Benedicta Sabdaningtyas - 5023211029",
-        "Adelia Safira - 5023211061"
-    ]
-    for member in group_members:
-        st.markdown(f"<p style='font-family:Georgia; color: black; font-size: 20px;'>{member}</p>", unsafe_allow_html=True)
+# Member placeholders
+members = [
+    {"name": "Leony Purba 5023211013", "gif": "Leo.gif"},
+    {"name": "Benedicta Sabdaningtyas 5023211029", "gif": "Bene.gif"},
+    {"name": "Farhan Majid 5023211049", "gif": "Farhan.gif"},
+    {"name": "Adelia Safira 5023211061", "gif": "Dela.gif"},
+]
 
+st.title("Meet the Team 🎉")
+
+for member in members:
+    with st.expander(f"{member['name']} - Click to reveal!"):
+        if st.button(f"Reveal {member['name']}"):
+            st.image(member["gif"])
+            time.sleep(2)  # Show the GIF for a moment
+            st.image(member["photo"], caption=f"{member['name']}'s Real Photo")
 # Eczema Subacute Page
 elif selected == "More About Eczema":
     st.markdown("<h1 style='text-align: center; color: red;'>LEARN MORE ABOUT ECZEMA📓</h1>", unsafe_allow_html=True)
