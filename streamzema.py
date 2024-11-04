@@ -31,7 +31,7 @@ page_styles = {
     "Feature Extraction": """
         <style>
             [data-testid="stAppViewContainer"] {
-                background: linear-gradient(to right, #a8edea, #fed6e3);
+                background: linear-gradient(to right, #2c3e50, #8e44ad, #e056fd);
                 color: white;
             }
         </style>
