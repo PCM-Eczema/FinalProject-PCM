@@ -39,7 +39,7 @@ page_styles = {
     "Chatbot": """
         <style>
             [data-testid="stAppViewContainer"] {
-                background: linear-gradient(to right, #e0f7df, #b2dfdb);
+                background: linear-gradient(to right, #1b5e20, #4caf50);
                 color: white;
             }
         </style>
