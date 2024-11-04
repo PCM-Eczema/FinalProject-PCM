@@ -72,10 +72,12 @@ if selected == "Home":
     st.title("Final Project ✨")
     st.subheader("Anggota Kelompok")
 
-    # Display each member's name and GIF
-    for member in members:
-        st.write(f"**{member['name']}**")
-        st.image(member["gif"])
+    # Display members in a 2x2 grid
+    cols = st.columns(2)
+    for idx, member in enumerate(members):
+        with cols[idx % 2]:  # Alternate between columns
+            st.write(f"**{member['name']}**")
+            st.image(member["gif"])
 
 # Eczema Subacute Page
 elif selected == "More About Eczema":
