@@ -10,22 +10,46 @@ from io import BytesIO
 
 # Judul Aplikasi
 st.title("Pengolahan Citra Medika")
-# Inject custom CSS
-st.markdown("""
-    <style>
-        [data-testid="stAppViewContainer"] {
-            background: linear-gradient(to right, #ff9a9e, #fecfef); /* Pink bright gradient */
-            color: white;
-        }
-        [data-testid="stHeader"] {
-            color: white;
-        }
-    </style>
-    """, unsafe_allow_html=True)
+# Define background styles for each page
+page_styles = {
+    "Home": """
+        <style>
+            [data-testid="stAppViewContainer"] {
+                background: linear-gradient(to right, #ff9a9e, #fecfef);
+                color: white;
+            }
+        </style>
+    """,
+    "More About Eczema": """
+        <style>
+            [data-testid="stAppViewContainer"] {
+                background: linear-gradient(to right, #fbc2eb, #a18cd1);
+                color: white;
+            }
+        </style>
+    """,
+    "Feature Extraction": """
+        <style>
+            [data-testid="stAppViewContainer"] {
+                background: linear-gradient(to right, #a8edea, #fed6e3);
+                color: white;
+            }
+        </style>
+    """,
+    "Chatbot": """
+        <style>
+            [data-testid="stAppViewContainer"] {
+                background: linear-gradient(to right, #ff9a9e, #ffdde1);
+                color: white;
+            }
+        </style>
+    """
+}
 
-# Sidebar menu
-with st.sidebar:
-    selected = option_menu("Pengolahan Citra Medika", ["Home", "More About Eczema", "Feature Extraction", "Chatbot"], default_index=0)
+# Apply CSS based on the selected page
+selected = option_menu("Pengolahan Citra Medika", ["Home", "More About Eczema", "Feature Extraction", "Chatbot"], default_index=0)
+st.markdown(page_styles[selected], unsafe_allow_html=True)
+
 
 # Home Page
 if selected == "Home":
