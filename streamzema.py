@@ -11,6 +11,7 @@ import time
 
 # Judul Aplikasi
 st.title("Pengolahan Citra Medika")
+
 # Define background styles for each page
 page_styles = {
     "Home": """
@@ -58,8 +59,7 @@ with st.sidebar:
 # Apply the appropriate CSS for each page based on the selected option
 st.markdown(page_styles[selected], unsafe_allow_html=True)
 
-
-# Member placeholders
+# Define members for photo reveal section
 members = [
     {"name": "Leony Purba 5023211013", "gif": "Leo.gif"},
     {"name": "Benedicta Sabdaningtyas 5023211029", "gif": "Bene.gif"},
@@ -67,14 +67,26 @@ members = [
     {"name": "Adelia Safira 5023211061", "gif": "Dela.gif"},
 ]
 
-st.title("Meet the Team 🎉")
+# Home Page
+if selected == "Home":
+    st.title("Final Project ✨")
+    st.subheader("Anggota kelompok")
+    group_members = [
+        "Farhan Majid - 5023211049",
+        "Leony Purba - 5023211013",
+        "Benedicta Sabdaningtyas - 5023211029",
+        "Adelia Safira - 5023211061"
+    ]
+    for member in group_members:
+        st.markdown(f"<p style='font-family:Georgia; color: black; font-size: 20px;'>{member}</p>", unsafe_allow_html=True)
+    
+    # Member Photo Reveal
+    st.title("Meet the Team 🎉")
+    for member in members:
+        with st.expander(f"{member['name']} - Click to reveal!"):
+            if st.button(f"Reveal {member['name']}"):
+                st.image(member["gif"])
 
-for member in members:
-    with st.expander(f"{member['name']} - Click to reveal!"):
-        if st.button(f"Reveal {member['name']}"):
-            st.image(member["gif"])
-            time.sleep(2)  # Show the GIF for a moment
-            st.image(member["photo"], caption=f"{member['name']}'s Real Photo")
 # Eczema Subacute Page
 elif selected == "More About Eczema":
     st.markdown("<h1 style='text-align: center; color: red;'>LEARN MORE ABOUT ECZEMA📓</h1>", unsafe_allow_html=True)
