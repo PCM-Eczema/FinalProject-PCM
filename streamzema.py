@@ -321,13 +321,15 @@ elif selected == "Feature Extraction":
             # Label the segmented image
             labels, nlabels = ndi.label(image_segmented)
             
-            # Display the grayscale image with colormap overlay
             fig, ax = plt.subplots()
-            ax.imshow(img, cmap='gray')  # Display the grayscale image
-            ax.imshow(labels, cmap='jet', alpha=0.5)  # Overlay with colormap (using 'jet' for color)
-        
-            # Add title and disable axis
-            ax.set_title("Grayscale Image with Colormap Overlay of Labeled Regions")
+            # Display the grayscale image as the base
+            ax.imshow(img, cmap='gray', interpolation='none')
+            
+            # Overlay the segmented regions with a colormap
+            ax.imshow(labels, cmap='jet', alpha=0.4)  # Adjust alpha for transparency
+            
+            # Set title and remove axis for a cleaner look
+            ax.set_title("Grayscale Image with Segmented Region Overlay")
             ax.axis('off')
             
             # Display the overlay in Streamlit
