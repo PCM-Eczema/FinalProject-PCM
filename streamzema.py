@@ -46,9 +46,14 @@ page_styles = {
     """
 }
 
-# Apply CSS based on the selected page
-selected = option_menu("Pengolahan Citra Medika", ["Home", "More About Eczema", "Feature Extraction", "Chatbot"], default_index=0)
-st.markdown(page_styles[selected], unsafe_allow_html=True)
+# Sidebar menu using Streamlit's sidebar
+with st.sidebar:
+    selected = option_menu(
+        "Pengolahan Citra Medika", 
+        ["Home", "More About Eczema", "Feature Extraction", "Chatbot"], 
+        default_index=0,
+        orientation="vertical"  # Ensure vertical orientation
+    )
 
 
 # Home Page
