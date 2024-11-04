@@ -51,9 +51,11 @@ with st.sidebar:
     selected = option_menu(
         "Pengolahan Citra Medika", 
         ["Home", "More About Eczema", "Feature Extraction", "Chatbot"], 
-        default_index=0,
-        orientation="vertical"  # Ensure vertical orientation
+        default_index=0
     )
+
+# Apply the appropriate CSS for each page based on the selected option
+st.markdown(page_styles[selected], unsafe_allow_html=True)
 
 
 # Home Page
