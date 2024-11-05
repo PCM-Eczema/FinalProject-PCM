@@ -8,6 +8,7 @@ from skimage.measure import regionprops_table
 from skimage import io, color, measure, img_as_ubyte, feature, filters, exposure, morphology
 from io import BytesIO
 import time
+import fuzzywuzzy
 
 # Judul Aplikasi
 st.title("Pengolahan Citra Medika")
